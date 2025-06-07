@@ -1,0 +1,287 @@
+<mujoco model="cf2_three">
+  <!--======================================================================
+    1) Compiler / Default Classes
+  ======================================================================-->
+  <compiler inertiafromgeom="false" meshdir="assets" autolimits="true"/>
+  <default>
+    <default class="cf2">
+      <!-- Visual-meshes (no collisions) -->
+      <default class="visual">
+        <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+      </default>
+      <!-- Collision-meshes -->
+      <default class="collision">
+        <geom group="3" type="mesh" contype="1" conaffinity="1"/>
+      </default>
+      <!-- All sites in class “cf2” default to group 5 -->
+      <site group="5"/>
+    </default>
+  </default>
+
+  <!--======================================================================
+    2) Assets: Materials + Meshes (same as before)
+  ======================================================================-->
+  <asset>
+    <material name="polished_plastic"     rgba="0.631 0.659 0.678 1"/>
+    <material name="polished_gold"        rgba="0.969 0.878 0.600 1"/>
+    <material name="medium_gloss_plastic" rgba="0.109 0.184 0.000 1"/>
+    <material name="propeller_plastic"    rgba="0.792 0.820 0.933 1"/>
+    <material name="white"                rgba="1     1     1     1"/>
+    <material name="body_frame_plastic"   rgba="0.102 0.102 0.102 1"/>
+    <material name="burnished_chrome"     rgba="0.898 0.898 0.898 1"/>
+
+    <!-- Visual meshes -->
+    <mesh file="cf2_0.obj"/>
+    <mesh file="cf2_1.obj"/>
+    <mesh file="cf2_2.obj"/>
+    <mesh file="cf2_3.obj"/>
+    <mesh file="cf2_4.obj"/>
+    <mesh file="cf2_5.obj"/>
+    <mesh file="cf2_6.obj"/>
+
+    <!-- Collision meshes -->
+    <mesh file="cf2_collision_0.obj"/>
+    <mesh file="cf2_collision_1.obj"/>
+    <mesh file="cf2_collision_2.obj"/>
+    <mesh file="cf2_collision_3.obj"/>
+    <mesh file="cf2_collision_4.obj"/>
+    <mesh file="cf2_collision_5.obj"/>
+    <mesh file="cf2_collision_6.obj"/>
+    <mesh file="cf2_collision_7.obj"/>
+    <mesh file="cf2_collision_8.obj"/>
+    <mesh file="cf2_collision_9.obj"/>
+    <mesh file="cf2_collision_10.obj"/>
+    <mesh file="cf2_collision_11.obj"/>
+    <mesh file="cf2_collision_12.obj"/>
+    <mesh file="cf2_collision_13.obj"/>
+    <mesh file="cf2_collision_14.obj"/>
+    <mesh file="cf2_collision_15.obj"/>
+    <mesh file="cf2_collision_16.obj"/>
+    <mesh file="cf2_collision_17.obj"/>
+    <mesh file="cf2_collision_18.obj"/>
+    <mesh file="cf2_collision_19.obj"/>
+    <mesh file="cf2_collision_20.obj"/>
+    <mesh file="cf2_collision_21.obj"/>
+    <mesh file="cf2_collision_22.obj"/>
+    <mesh file="cf2_collision_23.obj"/>
+    <mesh file="cf2_collision_24.obj"/>
+    <mesh file="cf2_collision_25.obj"/>
+    <mesh file="cf2_collision_26.obj"/>
+    <mesh file="cf2_collision_27.obj"/>
+    <mesh file="cf2_collision_28.obj"/>
+    <mesh file="cf2_collision_29.obj"/>
+    <mesh file="cf2_collision_30.obj"/>
+    <mesh file="cf2_collision_31.obj"/>
+  </asset>
+
+  <!--======================================================================
+    3) Worldbody: Three Separate cf2 Bodies
+  ======================================================================-->
+  <worldbody>
+
+    <body name="cf2_1" pos="-0.5 0 0.1" childclass="cf2">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="0.027" diaginertia="2.3951e-5 2.3951e-5 3.2347e-5"/>
+      <!-- Visual meshes -->
+      <geom mesh="cf2_0" material="propeller_plastic"    class="visual"/>
+      <geom mesh="cf2_1" material="medium_gloss_plastic" class="visual"/>
+      <geom mesh="cf2_2" material="polished_gold"        class="visual"/>
+      <geom mesh="cf2_3" material="polished_plastic"     class="visual"/>
+      <geom mesh="cf2_4" material="burnished_chrome"     class="visual"/>
+      <geom mesh="cf2_5" material="body_frame_plastic"   class="visual"/>
+      <geom mesh="cf2_6" material="white"                class="visual"/>
+      <!-- Collision meshes -->
+      <geom mesh="cf2_collision_0"  class="collision"/>
+      <geom mesh="cf2_collision_1"  class="collision"/>
+      <geom mesh="cf2_collision_2"  class="collision"/>
+      <geom mesh="cf2_collision_3"  class="collision"/>
+      <geom mesh="cf2_collision_4"  class="collision"/>
+      <geom mesh="cf2_collision_5"  class="collision"/>
+      <geom mesh="cf2_collision_6"  class="collision"/>
+      <geom mesh="cf2_collision_7"  class="collision"/>
+      <geom mesh="cf2_collision_8"  class="collision"/>
+      <geom mesh="cf2_collision_9"  class="collision"/>
+      <geom mesh="cf2_collision_10" class="collision"/>
+      <geom mesh="cf2_collision_11" class="collision"/>
+      <geom mesh="cf2_collision_12" class="collision"/>
+      <geom mesh="cf2_collision_13" class="collision"/>
+      <geom mesh="cf2_collision_14" class="collision"/>
+      <geom mesh="cf2_collision_15" class="collision"/>
+      <geom mesh="cf2_collision_16" class="collision"/>
+      <geom mesh="cf2_collision_17" class="collision"/>
+      <geom mesh="cf2_collision_18" class="collision"/>
+      <geom mesh="cf2_collision_19" class="collision"/>
+      <geom mesh="cf2_collision_20" class="collision"/>
+      <geom mesh="cf2_collision_21" class="collision"/>
+      <geom mesh="cf2_collision_22" class="collision"/>
+      <geom mesh="cf2_collision_23" class="collision"/>
+      <geom mesh="cf2_collision_24" class="collision"/>
+      <geom mesh="cf2_collision_25" class="collision"/>
+      <geom mesh="cf2_collision_26" class="collision"/>
+      <geom mesh="cf2_collision_27" class="collision"/>
+      <geom mesh="cf2_collision_28" class="collision"/>
+      <geom mesh="cf2_collision_29" class="collision"/>
+      <geom mesh="cf2_collision_30" class="collision"/>
+      <geom mesh="cf2_collision_31" class="collision"/>
+      <!-- Two sites (each body needs unique site names!) -->
+      <site name="imu1"/>
+      <site name="actuation1"/>
+    </body>
+
+
+    <body name="cf2_2" pos="0.0 0 0.1" childclass="cf2">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="0.027" diaginertia="2.3951e-5 2.3951e-5 3.2347e-5"/>
+      <!-- Visual meshes -->
+      <geom mesh="cf2_0" material="propeller_plastic"    class="visual"/>
+      <geom mesh="cf2_1" material="medium_gloss_plastic" class="visual"/>
+      <geom mesh="cf2_2" material="polished_gold"        class="visual"/>
+      <geom mesh="cf2_3" material="polished_plastic"     class="visual"/>
+      <geom mesh="cf2_4" material="burnished_chrome"     class="visual"/>
+      <geom mesh="cf2_5" material="body_frame_plastic"   class="visual"/>
+      <geom mesh="cf2_6" material="white"                class="visual"/>
+      <!-- Collision meshes -->
+      <geom mesh="cf2_collision_0"  class="collision"/>
+      <geom mesh="cf2_collision_1"  class="collision"/>
+      <geom mesh="cf2_collision_2"  class="collision"/>
+      <geom mesh="cf2_collision_3"  class="collision"/>
+      <geom mesh="cf2_collision_4"  class="collision"/>
+      <geom mesh="cf2_collision_5"  class="collision"/>
+      <geom mesh="cf2_collision_6"  class="collision"/>
+      <geom mesh="cf2_collision_7"  class="collision"/>
+      <geom mesh="cf2_collision_8"  class="collision"/>
+      <geom mesh="cf2_collision_9"  class="collision"/>
+      <geom mesh="cf2_collision_10" class="collision"/>
+      <geom mesh="cf2_collision_11" class="collision"/>
+      <geom mesh="cf2_collision_12" class="collision"/>
+      <geom mesh="cf2_collision_13" class="collision"/>
+      <geom mesh="cf2_collision_14" class="collision"/>
+      <geom mesh="cf2_collision_15" class="collision"/>
+      <geom mesh="cf2_collision_16" class="collision"/>
+      <geom mesh="cf2_collision_17" class="collision"/>
+      <geom mesh="cf2_collision_18" class="collision"/>
+      <geom mesh="cf2_collision_19" class="collision"/>
+      <geom mesh="cf2_collision_20" class="collision"/>
+      <geom mesh="cf2_collision_21" class="collision"/>
+      <geom mesh="cf2_collision_22" class="collision"/>
+      <geom mesh="cf2_collision_23" class="collision"/>
+      <geom mesh="cf2_collision_24" class="collision"/>
+      <geom mesh="cf2_collision_25" class="collision"/>
+      <geom mesh="cf2_collision_26" class="collision"/>
+      <geom mesh="cf2_collision_27" class="collision"/>
+      <geom mesh="cf2_collision_28" class="collision"/>
+      <geom mesh="cf2_collision_29" class="collision"/>
+      <geom mesh="cf2_collision_30" class="collision"/>
+      <geom mesh="cf2_collision_31" class="collision"/>
+      <!-- Two sites (unique names again) -->
+      <site name="imu2"/>
+      <site name="actuation2"/>
+    </body>
+
+
+    <body name="cf2_3" pos="0.5 0 0.1" childclass="cf2">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="0.027" diaginertia="2.3951e-5 2.3951e-5 3.2347e-5"/>
+      <!-- Visual meshes -->
+      <geom mesh="cf2_0" material="propeller_plastic"    class="visual"/>
+      <geom mesh="cf2_1" material="medium_gloss_plastic" class="visual"/>
+      <geom mesh="cf2_2" material="polished_gold"        class="visual"/>
+      <geom mesh="cf2_3" material="polished_plastic"     class="visual"/>
+      <geom mesh="cf2_4" material="burnished_chrome"     class="visual"/>
+      <geom mesh="cf2_5" material="body_frame_plastic"   class="visual"/>
+      <geom mesh="cf2_6" material="white"                class="visual"/>
+      <!-- Collision meshes -->
+      <geom mesh="cf2_collision_0"  class="collision"/>
+      <geom mesh="cf2_collision_1"  class="collision"/>
+      <geom mesh="cf2_collision_2"  class="collision"/>
+      <geom mesh="cf2_collision_3"  class="collision"/>
+      <geom mesh="cf2_collision_4"  class="collision"/>
+      <geom mesh="cf2_collision_5"  class="collision"/>
+      <geom mesh="cf2_collision_6"  class="collision"/>
+      <geom mesh="cf2_collision_7"  class="collision"/>
+      <geom mesh="cf2_collision_8"  class="collision"/>
+      <geom mesh="cf2_collision_9"  class="collision"/>
+      <geom mesh="cf2_collision_10" class="collision"/>
+      <geom mesh="cf2_collision_11" class="collision"/>
+      <geom mesh="cf2_collision_12" class="collision"/>
+      <geom mesh="cf2_collision_13" class="collision"/>
+      <geom mesh="cf2_collision_14" class="collision"/>
+      <geom mesh="cf2_collision_15" class="collision"/>
+      <geom mesh="cf2_collision_16" class="collision"/>
+      <geom mesh="cf2_collision_17" class="collision"/>
+      <geom mesh="cf2_collision_18" class="collision"/>
+      <geom mesh="cf2_collision_19" class="collision"/>
+      <geom mesh="cf2_collision_20" class="collision"/>
+      <geom mesh="cf2_collision_21" class="collision"/>
+      <geom mesh="cf2_collision_22" class="collision"/>
+      <geom mesh="cf2_collision_23" class="collision"/>
+      <geom mesh="cf2_collision_24" class="collision"/>
+      <geom mesh="cf2_collision_25" class="collision"/>
+      <geom mesh="cf2_collision_26" class="collision"/>
+      <geom mesh="cf2_collision_27" class="collision"/>
+      <geom mesh="cf2_collision_28" class="collision"/>
+      <geom mesh="cf2_collision_29" class="collision"/>
+      <geom mesh="cf2_collision_30" class="collision"/>
+      <geom mesh="cf2_collision_31" class="collision"/>
+      <!-- Two sites (unique) -->
+      <site name="imu3"/>
+      <site name="actuation3"/>
+    </body>
+  </worldbody>
+
+  <!--======================================================================
+    4) Actuators: 3 × {body_thrust, x_moment, y_moment, z_moment}
+    – each pointing at its own “actuationN” site.
+  ======================================================================-->
+  <actuator>
+    <!--——– CF2 #1 actuators ———-->
+    <motor class="cf2" name="cf2_1_thrust"   ctrlrange="0 0.35"
+           gear="0 0 1 0 0 0"  site="actuation1"/>
+    <motor class="cf2" name="cf2_1_xmoment"  ctrlrange="-1 1"
+           gear="0 0 0 -0.00001 0 0" site="actuation1"/>
+    <motor class="cf2" name="cf2_1_ymoment"  ctrlrange="-1 1"
+           gear="0 0 0 0 -0.00001 0" site="actuation1"/>
+    <motor class="cf2" name="cf2_1_zmoment"  ctrlrange="-1 1"
+           gear="0 0 0 0 0 -0.00001" site="actuation1"/>
+
+    <!--——– CF2 #2 actuators ———-->
+    <motor class="cf2" name="cf2_2_thrust"   ctrlrange="0 0.35"
+           gear="0 0 1 0 0 0"  site="actuation2"/>
+    <motor class="cf2" name="cf2_2_xmoment"  ctrlrange="-1 1"
+           gear="0 0 0 -0.00001 0 0" site="actuation2"/>
+    <motor class="cf2" name="cf2_2_ymoment"  ctrlrange="-1 1"
+           gear="0 0 0 0 -0.00001 0" site="actuation2"/>
+    <motor class="cf2" name="cf2_2_zmoment"  ctrlrange="-1 1"
+           gear="0 0 0 0 0 -0.00001" site="actuation2"/>
+
+    <!--——– CF2 #3 actuators ———-->
+    <motor class="cf2" name="cf2_3_thrust"   ctrlrange="0 0.35"
+           gear="0 0 1 0 0 0"  site="actuation3"/>
+    <motor class="cf2" name="cf2_3_xmoment"  ctrlrange="-1 1"
+           gear="0 0 0 -0.00001 0 0" site="actuation3"/>
+    <motor class="cf2" name="cf2_3_ymoment"  ctrlrange="-1 1"
+           gear="0 0 0 0 -0.00001 0" site="actuation3"/>
+    <motor class="cf2" name="cf2_3_zmoment"  ctrlrange="-1 1"
+           gear="0 0 0 0 0 -0.00001" site="actuation3"/>
+  </actuator>
+
+  <!--======================================================================
+    5) Sensors: 3 × {gyro, accelerometer, framequat}, each pointing at its own imuN
+  ======================================================================-->
+  <sensor>
+    <!-- CF2 #1 sensors -->
+    <gyro          name="cf2_1_gyro"    site="imu1"/>
+    <accelerometer name="cf2_1_linacc"  site="imu1"/>
+    <framequat     name="cf2_1_quat"    objtype="site" objname="imu1"/>
+
+    <!-- CF2 #2 sensors -->
+    <gyro          name="cf2_2_gyro"    site="imu2"/>
+    <accelerometer name="cf2_2_linacc"  site="imu2"/>
+    <framequat     name="cf2_2_quat"    objtype="site" objname="imu2"/>
+
+    <!-- CF2 #3 sensors -->
+    <gyro          name="cf2_3_gyro"    site="imu3"/>
+    <accelerometer name="cf2_3_linacc"  site="imu3"/>
+    <framequat     name="cf2_3_quat"    objtype="site" objname="imu3"/>
+  </sensor>
+</mujoco>

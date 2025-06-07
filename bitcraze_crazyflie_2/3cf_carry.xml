@@ -1,0 +1,291 @@
+<mujoco model="3cf_carry_box">
+  <!--─────────────────────────────────────────────────────────────────────────
+    Three Simplified Crazyflies Carrying a Box via Cables
+  ─────────────────────────────────────────────────────────────────────────-->
+  
+  <compiler inertiafromgeom="false" meshdir="assets" autolimits="true"/>
+  
+  <!-- Add cable plugin extension -->
+  <extension>
+    <plugin plugin="mujoco.elasticity.cable"/>
+  </extension>
+  
+  <option timestep="0.005" iterations="5" ls_iterations="8" integrator="implicitfast">
+    <flag eulerdamp="disable"/>
+  </option>
+
+  <!-- Custom metadata for MJX -->
+
+
+  <default>
+    <default class="cf2">
+      <!-- Visual geoms: no collision -->
+      <default class="visual">
+        <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+      </default>
+      <!-- Collision geoms for drones -->
+      <default class="collision">
+        <geom group="3" contype="1" conaffinity="1"/>
+      </default>
+      <!-- Box collision -->
+      <default class="box_collision">
+        <geom group="4" contype="2" conaffinity="3"/>
+      </default>
+      <!-- Cable constraints -->
+      <default class="cable">
+        <tendon damping="0.5" stiffness="1" range="0 0.5"/>
+      </default>
+      <site group="5"/>
+    </default>
+  </default>
+
+  <asset>
+    <!-- Crazyflie materials -->
+    <material name="propeller_plastic"    rgba="0.792 0.820 0.933 1"/>
+    <material name="medium_gloss_plastic" rgba="0.109 0.184 0.000 1"/>
+    <material name="polished_gold"        rgba="0.969 0.878 0.600 1"/>
+    <material name="polished_plastic"     rgba="0.631 0.659 0.678 1"/>
+    <material name="burnished_chrome"     rgba="0.898 0.898 0.898 1"/>
+    <material name="body_frame_plastic"   rgba="0.102 0.102 0.102 1"/>
+    <material name="white"                rgba="1     1     1     1"/>
+    
+    <!-- Box material -->
+    <material name="box_material"         rgba="0.8 0.4 0.2 1"/>
+    
+    <!-- Crazyflie visual meshes -->
+    <mesh file="cf2_0.obj"/>
+    <mesh file="cf2_1.obj"/>
+    <mesh file="cf2_2.obj"/>
+    <mesh file="cf2_3.obj"/>
+    <mesh file="cf2_4.obj"/>
+    <mesh file="cf2_5.obj"/>
+    <mesh file="cf2_6.obj"/>
+  </asset>
+
+  <worldbody>
+    <!-- Ground plane -->
+    
+    <!-- Central box to be carried (0.1m x 0.1m x 0.05m, 0.05kg) -->
+    <body name="payload_box" pos="0 0 0.05">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="0.05" diaginertia="4.17e-4 4.17e-4 8.33e-4"/>
+      
+      <!-- Box visual and collision -->
+      <geom name="box_visual" type="box" size="0.05 0.05 0.025" 
+            material="box_material" contype="0" conaffinity="0"/>
+      <geom name="box_collision" type="box" size="0.05 0.05 0.025" 
+            class="box_collision"/>
+      
+      <!-- Attachment points for cables (on top of box) -->
+      <site name="attach_1" pos="0.04  0.023 0.025"/>  <!-- 120° apart -->
+      <site name="attach_2" pos="-0.04 0.023 0.025"/>
+      <site name="attach_3" pos="0    -0.046 0.025"/>
+    </body>
+
+    <!--—— Crazyflie #1 (positioned above and forward-right of box) ——-->
+    <body name="cf2_1" pos="0.3 0.17 0.4" childclass="cf2">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="0.027" diaginertia="2.3951e-5 2.3951e-5 3.2347e-5"/>
+
+      <!-- Visual meshes -->
+      <geom mesh="cf2_0" material="propeller_plastic"    class="visual"/>
+      <geom mesh="cf2_1" material="medium_gloss_plastic" class="visual"/>
+      <geom mesh="cf2_2" material="polished_gold"        class="visual"/>
+      <geom mesh="cf2_3" material="polished_plastic"     class="visual"/>
+      <geom mesh="cf2_4" material="burnished_chrome"     class="visual"/>
+      <geom mesh="cf2_5" material="body_frame_plastic"   class="visual"/>
+      <geom mesh="cf2_6" material="white"                class="visual"/>
+
+      <!-- Simplified collision primitives -->
+      <geom type="sphere" size="0.02" pos="0 0 0" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="0.08  0    0" quat="0 1 0 1.5708" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="-0.08 0    0" quat="0 1 0 1.5708" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="0    0.08  0" quat="1 0 0 1.5708" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="0   -0.08  0" quat="1 0 0 1.5708" class="collision"/>
+      <geom type="sphere" size="0.015" pos="0.13  0    0" class="collision"/>
+      <geom type="sphere" size="0.015" pos="-0.13 0    0" class="collision"/>
+      <geom type="sphere" size="0.015" pos="0    0.13  0" class="collision"/>
+      <geom type="sphere" size="0.015" pos="0   -0.13  0" class="collision"/>
+
+      <!-- Sensors and actuation -->
+      <site name="imu1"/>
+      <site name="actuation1"/>
+      <!-- Cable attachment point -->
+      <site name="cable_attach_1" pos="0 0 -0.02"/>
+    </body>
+
+    <!--—— Crazyflie #2 (positioned above and forward-left of box) ——-->
+    <body name="cf2_2" pos="-0.3 0.17 0.4" childclass="cf2">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="0.027" diaginertia="2.3951e-5 2.3951e-5 3.2347e-5"/>
+
+      <!-- Visual meshes -->
+      <geom mesh="cf2_0" material="propeller_plastic"    class="visual"/>
+      <geom mesh="cf2_1" material="medium_gloss_plastic" class="visual"/>
+      <geom mesh="cf2_2" material="polished_gold"        class="visual"/>
+      <geom mesh="cf2_3" material="polished_plastic"     class="visual"/>
+      <geom mesh="cf2_4" material="burnished_chrome"     class="visual"/>
+      <geom mesh="cf2_5" material="body_frame_plastic"   class="visual"/>
+      <geom mesh="cf2_6" material="white"                class="visual"/>
+
+      <!-- Simplified collision primitives -->
+      <geom type="sphere" size="0.02" pos="0 0 0" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="0.08  0    0" quat="0 1 0 1.5708" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="-0.08 0    0" quat="0 1 0 1.5708" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="0    0.08  0" quat="1 0 0 1.5708" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="0   -0.08  0" quat="1 0 0 1.5708" class="collision"/>
+      <geom type="sphere" size="0.015" pos="0.13  0    0" class="collision"/>
+      <geom type="sphere" size="0.015" pos="-0.13 0    0" class="collision"/>
+      <geom type="sphere" size="0.015" pos="0    0.13  0" class="collision"/>
+      <geom type="sphere" size="0.015" pos="0   -0.13  0" class="collision"/>
+
+      <!-- Sensors and actuation -->
+      <site name="imu2"/>
+      <site name="actuation2"/>
+      <!-- Cable attachment point -->
+      <site name="cable_attach_2" pos="0 0 -0.02"/>
+    </body>
+
+    <!--—— Crazyflie #3 (positioned above and behind box) ——-->
+    <body name="cf2_3" pos="0 -0.35 0.4" childclass="cf2">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="0.027" diaginertia="2.3951e-5 2.3951e-5 3.2347e-5"/>
+
+      <!-- Visual meshes -->
+      <geom mesh="cf2_0" material="propeller_plastic"    class="visual"/>
+      <geom mesh="cf2_1" material="medium_gloss_plastic" class="visual"/>
+      <geom mesh="cf2_2" material="polished_gold"        class="visual"/>
+      <geom mesh="cf2_3" material="polished_plastic"     class="visual"/>
+      <geom mesh="cf2_4" material="burnished_chrome"     class="visual"/>
+      <geom mesh="cf2_5" material="body_frame_plastic"   class="visual"/>
+      <geom mesh="cf2_6" material="white"                class="visual"/>
+
+      <!-- Simplified collision primitives -->
+      <geom type="sphere" size="0.02" pos="0 0 0" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="0.08  0    0" quat="0 1 0 1.5708" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="-0.08 0    0" quat="0 1 0 1.5708" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="0    0.08  0" quat="1 0 0 1.5708" class="collision"/>
+      <geom type="capsule" size="0.01 0.05" pos="0   -0.08  0" quat="1 0 0 1.5708" class="collision"/>
+      <geom type="sphere" size="0.015" pos="0.13  0    0" class="collision"/>
+      <geom type="sphere" size="0.015" pos="-0.13 0    0" class="collision"/>
+      <geom type="sphere" size="0.015" pos="0    0.13  0" class="collision"/>
+      <geom type="sphere" size="0.015" pos="0   -0.13  0" class="collision"/>
+
+      <!-- Sensors and actuation -->
+      <site name="imu3"/>
+      <site name="actuation3"/>
+      <!-- Cable attachment point -->
+      <site name="cable_attach_3" pos="0 0 -0.02"/>
+    </body>
+    
+    <!-- Cable 1: CF1 to Box -->
+    <flexcomp type="cable" count="10" spacing="0.035" 
+              pos="0.3 0.17 0.38" zaxis="0.04 0.023 -0.355" 
+              radius="0.002" rgba="0.4 0.3 0.2 1" name="cable1" mass="0.01">
+      <contact selfcollide="none"/>
+      <edge damping="2"/>
+      <plugin plugin="mujoco.elasticity.cable">
+        <config key="twist" value="0.1"/>
+        <config key="bend" value="0.1"/>
+        <config key="vmax" value="0"/>
+      </plugin>
+    </flexcomp>
+    
+    <!-- Cable 2: CF2 to Box -->
+    <flexcomp type="cable" count="10" spacing="0.035" 
+              pos="-0.3 0.17 0.38" zaxis="-0.04 0.023 -0.355" 
+              radius="0.002" rgba="0.4 0.3 0.2 1" name="cable2" mass="0.01">
+      <contact selfcollide="none"/>
+      <edge damping="2"/>
+      <plugin plugin="mujoco.elasticity.cable">
+        <config key="twist" value="0.1"/>
+        <config key="bend" value="0.1"/>
+        <config key="vmax" value="0"/>
+      </plugin>
+    </flexcomp>
+    
+    <!-- Cable 3: CF3 to Box -->
+    <flexcomp type="cable" count="10" spacing="0.035" 
+              pos="0 -0.35 0.38" zaxis="0 -0.046 -0.355" 
+              radius="0.002" rgba="0.4 0.3 0.2 1" name="cable3" mass="0.01">
+      <contact selfcollide="none"/>
+      <edge damping="2"/>
+      <plugin plugin="mujoco.elasticity.cable">
+        <config key="twist" value="0.1"/>
+        <config key="bend" value="0.1"/>
+        <config key="vmax" value="0"/>
+      </plugin>
+    </flexcomp>
+  </worldbody>
+
+  <!-- Constraints to connect flexible cables to drones and box -->
+  <equality>
+    <!-- Connect cable1 end to CF1 -->
+    <connect name="cable1_to_cf1" body1="cf2_1" body2="B1_9" anchor="0 0 -0.02"/>
+    
+    <!-- Connect cable1 start to box -->
+    <connect name="cable1_to_box" body1="payload_box" body2="B1_0" anchor="0.04 0.023 0.025"/>
+    
+    <!-- Connect cable2 end to CF2 -->
+    <connect name="cable2_to_cf2" body1="cf2_2" body2="B2_9" anchor="0 0 -0.02"/>
+    
+    <!-- Connect cable2 start to box -->
+    <connect name="cable2_to_box" body1="payload_box" body2="B2_0" anchor="-0.04 0.023 0.025"/>
+    
+    <!-- Connect cable3 end to CF3 -->
+    <connect name="cable3_to_cf3" body1="cf2_3" body2="B3_9" anchor="0 0 -0.02"/>
+    
+    <!-- Connect cable3 start to box -->
+    <connect name="cable3_to_box" body1="payload_box" body2="B3_0" anchor="0 -0.046 0.025"/>
+  </equality>
+
+  <!-- Actuators for all three Crazyflies -->
+  <actuator>
+    <!-- CF1 actuators -->
+    <motor class="cf2" name="cf1_thrust"   ctrlrange="0 0.35"   gear="0 0 1  0  0    0"   site="actuation1"/>
+    <motor class="cf2" name="cf1_x_moment" ctrlrange="-1 1"     gear="0 0 0  -0.00001  0  0" site="actuation1"/>
+    <motor class="cf2" name="cf1_y_moment" ctrlrange="-1 1"     gear="0 0 0  0  -0.00001  0" site="actuation1"/>
+    <motor class="cf2" name="cf1_z_moment" ctrlrange="-1 1"     gear="0 0 0  0   0  -0.00001" site="actuation1"/>
+
+    <!-- CF2 actuators -->
+    <motor class="cf2" name="cf2_thrust"   ctrlrange="0 0.35"   gear="0 0 1  0  0    0"   site="actuation2"/>
+    <motor class="cf2" name="cf2_x_moment" ctrlrange="-1 1"     gear="0 0 0  -0.00001  0  0" site="actuation2"/>
+    <motor class="cf2" name="cf2_y_moment" ctrlrange="-1 1"     gear="0 0 0  0  -0.00001  0" site="actuation2"/>
+    <motor class="cf2" name="cf2_z_moment" ctrlrange="-1 1"     gear="0 0 0  0   0  -0.00001" site="actuation2"/>
+
+    <!-- CF3 actuators -->
+    <motor class="cf2" name="cf3_thrust"   ctrlrange="0 0.35"   gear="0 0 1  0  0    0"   site="actuation3"/>
+    <motor class="cf2" name="cf3_x_moment" ctrlrange="-1 1"     gear="0 0 0  -0.00001  0  0" site="actuation3"/>
+    <motor class="cf2" name="cf3_y_moment" ctrlrange="-1 1"     gear="0 0 0  0  -0.00001  0" site="actuation3"/>
+    <motor class="cf2" name="cf3_z_moment" ctrlrange="-1 1"     gear="0 0 0  0   0  -0.00001" site="actuation3"/>
+  </actuator>
+
+  <!-- Sensors for all three Crazyflies -->
+  <sensor>
+    <!-- CF1 sensors -->
+    <gyro          name="cf1_gyro"    site="imu1"/>
+    <accelerometer name="cf1_linacc"  site="imu1"/>
+    <framequat     name="cf1_quat"    objtype="site" objname="imu1"/>
+
+    <!-- CF2 sensors -->
+    <gyro          name="cf2_gyro"    site="imu2"/>
+    <accelerometer name="cf2_linacc"  site="imu2"/>
+    <framequat     name="cf2_quat"    objtype="site" objname="imu2"/>
+
+    <!-- CF3 sensors -->
+    <gyro          name="cf3_gyro"    site="imu3"/>
+    <accelerometer name="cf3_linacc"  site="imu3"/>
+    <framequat     name="cf3_quat"    objtype="site" objname="imu3"/>
+
+    <!-- Box sensors -->
+    <framequat     name="box_quat"    objtype="body" objname="payload_box"/>
+    <framepos      name="box_pos"     objtype="body" objname="payload_box"/>
+  </sensor>
+
+  <!-- Initial configuration for cooperative carrying -->
+  <keyframe>
+    <key name="carrying_formation" 
+         qpos="0 0 0.05 1 0 0 0    0.3 0.17 0.4 1 0 0 0    -0.3 0.17 0.4 1 0 0 0    0 -0.35 0.4 1 0 0 0"
+         ctrl="0.17 0 0 0    0.17 0 0 0    0.17 0 0 0"/>
+  </keyframe>
+</mujoco>

@@ -1,0 +1,230 @@
+<mujoco model="cf2_two">
+  <!--─────────────────────────────────────────────────────────────────────────
+    1) Compiler & Default Classes
+  ─────────────────────────────────────────────────────────────────────────-->
+  <compiler inertiafromgeom="false" meshdir="assets" autolimits="true"/>
+  <default>
+    <default class="cf2">
+      <!-- Visual geoms: contype=0, conaffinity=0, group=2 -->
+      <default class="visual">
+        <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+      </default>
+      <!-- Collision geoms: contype=1, conaffinity=1, group=3 -->
+      <default class="collision">
+        <geom group="3" type="mesh" contype="1" conaffinity="1"/>
+      </default>
+      <!-- Every <site> in class="cf2" → group=5 -->
+      <site group="5"/>
+    </default>
+  </default>
+
+  <!--─────────────────────────────────────────────────────────────────────────
+    2) Assets: Only the 7 Visual Meshes
+  ─────────────────────────────────────────────────────────────────────────-->
+  <asset>
+    <material name="propeller_plastic"    rgba="0.792 0.820 0.933 1"/>
+    <material name="medium_gloss_plastic" rgba="0.109 0.184 0.000 1"/>
+    <material name="polished_gold"        rgba="0.969 0.878 0.600 1"/>
+    <material name="polished_plastic"     rgba="0.631 0.659 0.678 1"/>
+    <material name="burnished_chrome"     rgba="0.898 0.898 0.898 1"/>
+    <material name="body_frame_plastic"   rgba="0.102 0.102 0.102 1"/>
+    <material name="white"                rgba="1     1     1     1"/>
+
+    <mesh file="cf2_0.obj"/>
+    <mesh file="cf2_1.obj"/>
+    <mesh file="cf2_2.obj"/>
+    <mesh file="cf2_3.obj"/>
+    <mesh file="cf2_4.obj"/>
+    <mesh file="cf2_5.obj"/>
+    <mesh file="cf2_6.obj"/>
+  </asset>
+
+  <!--─────────────────────────────────────────────────────────────────────────
+    3) Worldbody: Two Free‐Floating Crazyflies
+  ─────────────────────────────────────────────────────────────────────────-->
+  <worldbody>
+    <!--—— Crazyflie #1 ——-->
+    <body name="cf2_1" pos="-0.2 0 0.1" childclass="cf2">
+      <freejoint/>
+      <inertial pos="0 0 0"
+                mass="0.027"
+                diaginertia="2.3951e-5 2.3951e-5 3.2347e-5"/>
+
+      <!-- Camera tracking the combined center of mass (optional) -->
+      <camera name="track" pos="-1 0 0.5" xyaxes="0 -1 0  1 0 2" mode="trackcom"/>
+
+      <!-- Visual meshes -->
+      <geom mesh="cf2_0" material="propeller_plastic"    class="visual"/>
+      <geom mesh="cf2_1" material="medium_gloss_plastic" class="visual"/>
+      <geom mesh="cf2_2" material="polished_gold"        class="visual"/>
+      <geom mesh="cf2_3" material="polished_plastic"     class="visual"/>
+      <geom mesh="cf2_4" material="burnished_chrome"     class="visual"/>
+      <geom mesh="cf2_5" material="body_frame_plastic"   class="visual"/>
+      <geom mesh="cf2_6" material="white"                class="visual"/>
+
+      <!-- Collision primitives (no initial overlap) -->
+      <!-- Central sphere (radius 0.02) -->
+      <geom type="sphere"
+            size="0.02"
+            pos="0 0 0"
+            class="collision"/>
+
+      <!-- Four rotor‐arms as capsules (radius 0.01, half‐length 0.05) -->
+      <geom type="capsule"
+            size="0.01 0.05"
+            pos="0.08  0    0"
+            quat="0 1 0 1.5708"
+            class="collision"/>
+      <geom type="capsule"
+            size="0.01 0.05"
+            pos="-0.08 0    0"
+            quat="0 1 0 1.5708"
+            class="collision"/>
+      <geom type="capsule"
+            size="0.01 0.05"
+            pos="0    0.08  0"
+            quat="1 0 0 1.5708"
+            class="collision"/>
+      <geom type="capsule"
+            size="0.01 0.05"
+            pos="0   -0.08  0"
+            quat="1 0 0 1.5708"
+            class="collision"/>
+
+      <!-- Four rotor‐hubs as spheres (radius 0.015) -->
+      <geom type="sphere"
+            size="0.015"
+            pos="0.13  0    0"
+            class="collision"/>
+      <geom type="sphere"
+            size="0.015"
+            pos="-0.13 0    0"
+            class="collision"/>
+      <geom type="sphere"
+            size="0.015"
+            pos="0    0.13  0"
+            class="collision"/>
+      <geom type="sphere"
+            size="0.015"
+            pos="0   -0.13  0"
+            class="collision"/>
+
+      <!-- Sites -->
+      <site name="imu1"/>
+      <site name="actuation1"/>
+    </body>
+
+    <!--—— Crazyflie #2 ——-->
+    <body name="cf2_2" pos="0.2 0 0.1" childclass="cf2">
+      <freejoint/>
+      <inertial pos="0 0 0"
+                mass="0.027"
+                diaginertia="2.3951e-5 2.3951e-5 3.2347e-5"/>
+
+      <!-- Visual meshes -->
+      <geom mesh="cf2_0" material="propeller_plastic"    class="visual"/>
+      <geom mesh="cf2_1" material="medium_gloss_plastic" class="visual"/>
+      <geom mesh="cf2_2" material="polished_gold"        class="visual"/>
+      <geom mesh="cf2_3" material="polished_plastic"     class="visual"/>
+      <geom mesh="cf2_4" material="burnished_chrome"     class="visual"/>
+      <geom mesh="cf2_5" material="body_frame_plastic"   class="visual"/>
+      <geom mesh="cf2_6" material="white"                class="visual"/>
+
+      <!-- Collision primitives (positioned identically relative to body frame) -->
+      <geom type="sphere"
+            size="0.02"
+            pos="0 0 0"
+            class="collision"/>
+
+      <geom type="capsule"
+            size="0.01 0.05"
+            pos="0.08  0    0"
+            quat="0 1 0 1.5708"
+            class="collision"/>
+      <geom type="capsule"
+            size="0.01 0.05"
+            pos="-0.08 0    0"
+            quat="0 1 0 1.5708"
+            class="collision"/>
+      <geom type="capsule"
+            size="0.01 0.05"
+            pos="0    0.08  0"
+            quat="1 0 0 1.5708"
+            class="collision"/>
+      <geom type="capsule"
+            size="0.01 0.05"
+            pos="0   -0.08  0"
+            quat="1 0 0 1.5708"
+            class="collision"/>
+
+      <geom type="sphere"
+            size="0.015"
+            pos="0.13  0    0"
+            class="collision"/>
+      <geom type="sphere"
+            size="0.015"
+            pos="-0.13 0    0"
+            class="collision"/>
+      <geom type="sphere"
+            size="0.015"
+            pos="0    0.13  0"
+            class="collision"/>
+      <geom type="sphere"
+            size="0.015"
+            pos="0   -0.13  0"
+            class="collision"/>
+
+      <!-- Sites -->
+      <site name="imu2"/>
+      <site name="actuation2"/>
+    </body>
+  </worldbody>
+
+  <!--─────────────────────────────────────────────────────────────────────────
+    4) Actuators: Two × {thrust, x_moment, y_moment, z_moment}
+  ─────────────────────────────────────────────────────────────────────────-->
+  <actuator>
+    <!-- CF2 #1 actuators -->
+    <motor class="cf2" name="cf2_1_thrust"   ctrlrange="0 0.35"
+           gear="0 0 1  0  0    0"
+           site="actuation1"/>
+    <motor class="cf2" name="cf2_1_xmoment"  ctrlrange="-1 1"
+           gear="0 0 0  -0.00001  0  0"
+           site="actuation1"/>
+    <motor class="cf2" name="cf2_1_ymoment"  ctrlrange="-1 1"
+           gear="0 0 0  0  -0.00001  0"
+           site="actuation1"/>
+    <motor class="cf2" name="cf2_1_zmoment"  ctrlrange="-1 1"
+           gear="0 0 0  0   0  -0.00001"
+           site="actuation1"/>
+
+    <!-- CF2 #2 actuators -->
+    <motor class="cf2" name="cf2_2_thrust"   ctrlrange="0 0.35"
+           gear="0 0 1  0  0    0"
+           site="actuation2"/>
+    <motor class="cf2" name="cf2_2_xmoment"  ctrlrange="-1 1"
+           gear="0 0 0  -0.00001  0  0"
+           site="actuation2"/>
+    <motor class="cf2" name="cf2_2_ymoment"  ctrlrange="-1 1"
+           gear="0 0 0  0  -0.00001  0"
+           site="actuation2"/>
+    <motor class="cf2" name="cf2_2_zmoment"  ctrlrange="-1 1"
+           gear="0 0 0  0   0  -0.00001"
+           site="actuation2"/>
+  </actuator>
+
+  <!--─────────────────────────────────────────────────────────────────────────
+    5) Sensors: Two × {gyro, accelerometer, framequat}
+  ─────────────────────────────────────────────────────────────────────────-->
+  <sensor>
+    <!-- CF2 #1 sensors -->
+    <gyro          name="cf2_1_gyro"    site="imu1"/>
+    <accelerometer name="cf2_1_linacc"  site="imu1"/>
+    <framequat     name="cf2_1_quat"    objtype="site" objname="imu1"/>
+
+    <!-- CF2 #2 sensors -->
+    <gyro          name="cf2_2_gyro"    site="imu2"/>
+    <accelerometer name="cf2_2_linacc"  site="imu2"/>
+    <framequat     name="cf2_2_quat"    objtype="site" objname="imu2"/>
+  </sensor>
+</mujoco>
