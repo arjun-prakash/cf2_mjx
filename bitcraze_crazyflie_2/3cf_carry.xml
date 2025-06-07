@@ -5,11 +5,6 @@
   
   <compiler inertiafromgeom="false" meshdir="assets" autolimits="true"/>
   
-  <!-- Add cable plugin extension -->
-  <extension>
-    <plugin plugin="mujoco.elasticity.cable"/>
-  </extension>
-  
   <option timestep="0.005" iterations="5" ls_iterations="8" integrator="implicitfast">
     <flag eulerdamp="disable"/>
   </option>
@@ -177,67 +172,28 @@
       <!-- Cable attachment point -->
       <site name="cable_attach_3" pos="0 0 -0.02"/>
     </body>
-    
-    <!-- Cable 1: CF1 to Box -->
-    <flexcomp type="cable" count="10" spacing="0.035" 
-              pos="0.3 0.17 0.38" zaxis="0.04 0.023 -0.355" 
-              radius="0.002" rgba="0.4 0.3 0.2 1" name="cable1" mass="0.01">
-      <contact selfcollide="none"/>
-      <edge damping="2"/>
-      <plugin plugin="mujoco.elasticity.cable">
-        <config key="twist" value="0.1"/>
-        <config key="bend" value="0.1"/>
-        <config key="vmax" value="0"/>
-      </plugin>
-    </flexcomp>
-    
-    <!-- Cable 2: CF2 to Box -->
-    <flexcomp type="cable" count="10" spacing="0.035" 
-              pos="-0.3 0.17 0.38" zaxis="-0.04 0.023 -0.355" 
-              radius="0.002" rgba="0.4 0.3 0.2 1" name="cable2" mass="0.01">
-      <contact selfcollide="none"/>
-      <edge damping="2"/>
-      <plugin plugin="mujoco.elasticity.cable">
-        <config key="twist" value="0.1"/>
-        <config key="bend" value="0.1"/>
-        <config key="vmax" value="0"/>
-      </plugin>
-    </flexcomp>
-    
-    <!-- Cable 3: CF3 to Box -->
-    <flexcomp type="cable" count="10" spacing="0.035" 
-              pos="0 -0.35 0.38" zaxis="0 -0.046 -0.355" 
-              radius="0.002" rgba="0.4 0.3 0.2 1" name="cable3" mass="0.01">
-      <contact selfcollide="none"/>
-      <edge damping="2"/>
-      <plugin plugin="mujoco.elasticity.cable">
-        <config key="twist" value="0.1"/>
-        <config key="bend" value="0.1"/>
-        <config key="vmax" value="0"/>
-      </plugin>
-    </flexcomp>
   </worldbody>
 
-  <!-- Constraints to connect flexible cables to drones and box -->
-  <equality>
-    <!-- Connect cable1 end to CF1 -->
-    <connect name="cable1_to_cf1" body1="cf2_1" body2="B1_9" anchor="0 0 -0.02"/>
+  <!-- Cable connections between drones and box -->
+  <tendon>
+    <!-- Cable from CF1 rope end to box attachment point 1 -->
+    <spatial name="cable_1" class="cable">
+      <site site="cable_attach_1"/>
+      <site site="attach_1"/>
+    </spatial>
     
-    <!-- Connect cable1 start to box -->
-    <connect name="cable1_to_box" body1="payload_box" body2="B1_0" anchor="0.04 0.023 0.025"/>
+    <!-- Cable from CF2 to box attachment point 2 -->
+    <spatial name="cable_2" class="cable">
+      <site site="cable_attach_2"/>
+      <site site="attach_2"/>
+    </spatial>
     
-    <!-- Connect cable2 end to CF2 -->
-    <connect name="cable2_to_cf2" body1="cf2_2" body2="B2_9" anchor="0 0 -0.02"/>
-    
-    <!-- Connect cable2 start to box -->
-    <connect name="cable2_to_box" body1="payload_box" body2="B2_0" anchor="-0.04 0.023 0.025"/>
-    
-    <!-- Connect cable3 end to CF3 -->
-    <connect name="cable3_to_cf3" body1="cf2_3" body2="B3_9" anchor="0 0 -0.02"/>
-    
-    <!-- Connect cable3 start to box -->
-    <connect name="cable3_to_box" body1="payload_box" body2="B3_0" anchor="0 -0.046 0.025"/>
-  </equality>
+    <!-- Cable from CF3 to box attachment point 3 -->
+    <spatial name="cable_3" class="cable">
+      <site site="cable_attach_3"/>
+      <site site="attach_3"/>
+    </spatial>
+  </tendon>
 
   <!-- Actuators for all three Crazyflies -->
   <actuator>
@@ -283,9 +239,5 @@
   </sensor>
 
   <!-- Initial configuration for cooperative carrying -->
-  <keyframe>
-    <key name="carrying_formation" 
-         qpos="0 0 0.05 1 0 0 0    0.3 0.17 0.4 1 0 0 0    -0.3 0.17 0.4 1 0 0 0    0 -0.35 0.4 1 0 0 0"
-         ctrl="0.17 0 0 0    0.17 0 0 0    0.17 0 0 0"/>
-  </keyframe>
+
 </mujoco>
