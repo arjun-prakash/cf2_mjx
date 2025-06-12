@@ -140,7 +140,7 @@ while mjx_data.time < duration:
   mjx_data = jit_step(mjx_model, mjx_data)
   if len(frames) < mjx_data.time * framerate:
     mj_data = mjx.get_data(mj_model, mjx_data)
-    renderer.update_scene(mj_data, scene_option=scene_option)
+    renderer.update_scene(mj_data, scene_option=scene_option, camera=cam)
     pixels = renderer.render()
     frames.append(pixels)
     print(mjx_data.time)

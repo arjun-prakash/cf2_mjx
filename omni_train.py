@@ -39,95 +39,105 @@ from brax.io import html, mjcf, model
 
 
 
-class CarryBoxEnv(PipelineEnv):
-  """Three Crazyflies carry a box to 1 m and keep it stable."""
+import jax.numpy as jnp
+from brax import math
 
+class CarryBoxEnv(PipelineEnv):
   def __init__(self,
                target_height: float = 1.0,
-               height_reward_weight: float = 5.0,
-               ctrl_cost_weight: float = 0.1,
-               stability_cost_weight: float = 0.5,
-               reset_noise_scale: float = 1e-2,
+               # — new reward hyper-parameters —
+               reward_distance_scale: float    = 1.6,
+               reward_align_weight: float      = 0.5,
+               reward_swing_weight: float      = 0.1,
+               reward_effort_weight: float     = 0.1,
+               reward_smoothness_weight: float = 0.05,
                **kwargs):
-    # load your MJX model
-    mj_model = mujoco.MjModel.from_xml_path("bitcraze_crazyflie_2/scene_mjx.xml")   # or full path
-    mj_model.opt.solver       = mujoco.mjtSolver.mjSOL_CG
-    mj_model.opt.iterations   = 10
-    mj_model.opt.ls_iterations= 10
-
-    sys = mjcf.load_model(mj_model)
-
-    # number of physics steps per control action
-    physics_steps = 5
-    kwargs['n_frames'] = kwargs.get('n_frames', physics_steps)
-    kwargs['backend']  = 'mjx'
-
+    # load MJX model & system as before
+    mj_model = mujoco.MjModel.from_xml_path("bitcraze_crazyflie_2/scene_mjx.xml")
+    sys      = mjcf.load_model(mj_model)
     super().__init__(sys, **kwargs)
 
-    self.target_height          = target_height
-    self.height_reward_weight   = height_reward_weight
-    self.ctrl_cost_weight       = ctrl_cost_weight
-    self.stability_cost_weight  = stability_cost_weight
-    self.reset_noise_scale      = reset_noise_scale
-
-    # cache body index for the payload box
+    self.target_height           = target_height
+    # store new reward weights
+    self.reward_distance_scale   = reward_distance_scale
+    self.reward_align_weight     = reward_align_weight
+    self.reward_swing_weight     = reward_swing_weight
+    self.reward_effort_weight    = reward_effort_weight
+    self.reward_smoothness_weight= reward_smoothness_weight
 
   def reset(self, rng: jnp.ndarray) -> State:
     rng, rng1, rng2 = jax.random.split(rng, 3)
-    # add a little noise around default qpos0 / qvel0
-    low, hi = -self.reset_noise_scale, self.reset_noise_scale
-    qpos = self.sys.qpos0# + jax.random.uniform(rng1, (self.sys.nq,), low, hi)
+    qpos = self.sys.qpos0
     qvel = jax.random.uniform(rng2, (self.sys.nv,), minval=-0.01, maxval=0.01)
     data = self.pipeline_init(qpos, qvel)
 
-    # initial observation, zero reward/done/metrics
-    obs    = self._get_obs(data, jnp.zeros(self.sys.nu))
-    reward = jnp.array(0.0)
-    done   = jnp.array(0.0)
+    # zero-out last_action so smoothness has a baseline
+    obs = self._get_obs(data, jnp.zeros(self.sys.nu))
+     # **Initialize every metric key that step() will ever write:**
     metrics = {
-      'height'       : data.qpos[6],
-      'height_error' : jnp.abs(data.qpos[6] - self.target_height),
-      'reward_height' : 0.0,
-      'reward_ctrl' : 0.0,
-      'reward_stability' : 0.0
+      'reward_pose'      : jnp.array(0.0),
+      'reward_align'     : jnp.array(0.0),
+      'reward_swing'     : jnp.array(0.0),
+      'reward_effort'    : jnp.array(0.0),
     }
-    return State(data, obs, reward, done, metrics)
+    return State(data, obs, 0.0, 0.0, metrics)
 
   def step(self, state: State, action: jnp.ndarray) -> State:
     data0 = state.pipeline_state
     data1 = self.pipeline_step(data0, action)
 
-    # 1) height reward: encourage box_z ≈ target_height
-    box_z = data1.qpos[6]
-    height_err = box_z - self.target_height
-    #reward_height = -(height_err**2)
-    reward_height = data1.qpos[6]**2
+    # 1) pose error → r_pose = exp(-scale · ‖pos - target‖)
+    box_quat = data1.qpos[:4]
+    box_pos  = data1.qpos[4:7]
+    target   = jnp.array([0., 0., self.target_height])
+    pos_err  = jnp.linalg.norm(box_pos - target)
+    r_pose   = jnp.exp(- self.reward_distance_scale * pos_err)
 
-    # 2) control cost
-    ctrl_cost = self.ctrl_cost_weight * jnp.sum(jnp.square(action))
+    # 2) orientation alignment → r_align = ((up·world_up + 1)/2)^2
+    up_vec   = math.rotate(jnp.array([0., 0., 1.]), box_quat)
+    world_up = jnp.array([0., 0., 1.])
+    r_align  = ((jnp.dot(up_vec, world_up) + 1.) / 2.)**2
 
-    # 3) stability cost: penalize box angular velocity (rough proxy)
-    #    we can get body angular vel from data1.cvel (twist) for each body:
-    ang_vel = data1.cvel[0, 3:]   # shape (3,)
-    stab_cost = self.stability_cost_weight * jnp.sum(jnp.square(ang_vel))
+    # 3) swing/spin penalty → r_swing = 1/(1 + ω^2)
+    ang_vel  = data1.cvel[0, 3:]                  # box’s angular velocity
+    spin     = jnp.linalg.norm(ang_vel)
+    r_swing  = 1. / (1. + spin**2)
 
-    reward = reward_height #- ctrl_cost - stab_cost
-    done = jnp.where((box_z <= 0.0) | (box_z >= 2.0), 1.0, 0.0)
+    # 4) effort cost
+    r_effort = 0.0# self.reward_effort_weight * jnp.exp(-jnp.sum(jnp.square(action)))
 
-    obs = self._get_obs(data1, action)
-    # update metrics for logging
-    state.metrics.update(
-      height=box_z,
-      height_error=jnp.abs(height_err),
-      reward_height=reward_height,
-      reward_ctrl=-ctrl_cost,
-      reward_stability=-stab_cost,
+    # 5) action smoothness
+    # delta    = action - prev_act
+    # r_smooth = self.reward_smoothness_weight * jnp.sum(jnp.square(delta))
+
+    # combine them
+    reward = (
+      r_pose
+      + r_pose * (r_align + r_swing)
+      + r_effort
     )
 
-    return state.replace(pipeline_state=data1,
-                         obs=obs,
-                         reward=reward,
-                         done=done)
+    # termination logic (unchanged)
+    done = jnp.where((box_pos[2] <= 0.0) | (box_pos[2] >= 2.0), 1.0, 0.0)
+
+    # build new observation
+    obs = self._get_obs(data1, action)
+
+    # update metrics for logging / smoothness
+    state.metrics.update({
+      'reward_pose'      : r_pose,
+      'reward_align'     : r_align,
+      'reward_swing'     : r_swing,
+      'reward_effort'    : r_effort,
+    })
+
+    return state.replace(
+      pipeline_state = data1,
+      obs            = obs,
+      reward         = reward,
+      done           = done,
+    )
+
 
   def _get_obs(self, data, action):
     # you can observe:
@@ -190,7 +200,7 @@ train_fn = functools.partial(
     num_timesteps=50000000,
     num_evals=5,
     reward_scaling=0.1,
-    episode_length=200,
+    episode_length=500,
     normalize_observations=True,
     action_repeat=1,
     unroll_length=10,
@@ -249,7 +259,7 @@ state = jit_reset(rng)
 rollout = [state.pipeline_state]
 
 # grab a trajectory
-n_steps = 200
+n_steps = 500
 render_every = 2
 
 for i in range(n_steps):
